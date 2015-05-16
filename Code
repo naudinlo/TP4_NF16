@@ -1,0 +1,217 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/**************************************************************************/
+
+typedef struct Node { 
+	char letter;
+	// pour l’arbre
+	struct Node * parent; 
+	struct Node * left; 
+	struct Node * right; 
+	// pour la liste
+	struct Node * next ; 
+} Node;
+
+typedef struct ListNode { 
+	struct Node * start;
+	int number ; 
+} ListNode;
+
+/**************************************************************************/
+
+Node * createNode(char letter){
+	Node * nouveau=malloc(sizeof(Node));
+	if(letter=='A'||letter=='B'){
+		nouveau->letter=letter;
+		nouveau->parent=NULL;
+		nouveau->left=NULL;
+		nouveau->right=NULL;
+		nouveau->next=NULL;
+	}
+	return nouveau;
+}
+
+/**************************************************************************/
+
+void generateChilds(Node * node){
+	if(node->letter=='A'){
+		node->left=createNode('B');
+	}
+	else {
+		if(node->letter=='B'){
+		node->left=createNode('A');
+		node->right=createNode('B');
+		}
+		else{
+			printf("Erreur lors de la génération suivante\n");
+		}
+	}
+}
+
+/**************************************************************************/
+
+/*Node * supprimer_node(Node * root){ 
+   if(root->left==NULL) {
+		return root = root->right; 
+	}
+	else{
+		if(root->right==NULL) {
+			return root = root->left;
+		}
+		else{ 
+        	Node * root_1 = root->left;
+        	Node * pere = root;
+        	while(root_1->right!=NULL) {
+        		pere = root_1;
+        		root_1 = root_1->right;
+        	}
+        	root-> letter= root_1->letter;
+        	if(pere == root) {
+        		pere->left = root_1->left;
+        	}
+        	else {
+        		pere->right = root_1->left;
+        	}
+        	return root;
+        }
+    }
+}*/
+
+
+//PROBLEME ICI
+void freeTree(Node * root){
+	if (root == NULL){
+		return;
+	}
+ 
+  freeTree(root->left);
+  freeTree(root->right);
+
+  free(root);
+}
+
+/**************************************************************************/
+
+void displayTree(Node*root){
+	//Cas noeud vide
+	if (root==NULL){
+		printf("-");
+		return;
+	}
+	//Cas noeud A : {B, A, -}
+	if (root->letter=='A'){
+		if(root->left!=NULL){
+			printf("{");
+			displayTree(root->left);
+			printf(",");
+			printf("A,");
+			printf("-");
+			printf("}");
+		}
+		else{		
+		printf("A,");
+		}
+	}
+	//Cas noeud B : {A, B, B}
+	if (root->letter=='B'){
+		if(root->left!=NULL && root->right !=NULL){
+			printf("{");
+			displayTree(root->left);
+			printf("B,");
+			displayTree(root->right);
+			printf("}");
+		}
+		else{
+			printf("B");
+		}	
+	}
+}
+
+/**************************************************************************/
+
+ListNode * createList(){
+	ListNode * nouvelle=malloc(sizeof(ListNode));
+	if(nouvelle!=NULL){
+		nouvelle->number=0;
+		nouvelle->start=NULL;
+		return nouvelle;
+	}
+	else{
+		printf("Erreur lors de la création de la liste.\n");
+		return NULL;
+	}
+}
+
+
+/**************************************************************************/
+
+
+void addEndList(ListNode * list, Node * node){
+	Node * actuel;
+	if (list==NULL){
+		printf("La liste est vide.\n");
+		return;
+	}
+	else{
+		actuel=list->start;
+		while(actuel->next!=NULL){
+			actuel=actuel->next;
+		}
+		actuel->next=node;
+	}
+}
+
+
+/**************************************************************************/
+
+//??? Consigne
+ListNode * generateList(ListNode * list);
+
+
+
+/**************************************************************************/
+
+
+
+int main (){
+
+	Node * nouveau_A=createNode('A');
+	Node * nouveau_B=createNode('B');
+
+	generateChilds(nouveau_A);
+	generateChilds(nouveau_B);
+
+	printf("1e génération A\n");
+	displayTree(nouveau_A);
+	printf("\n");
+
+	printf("1e génération B\n");
+	displayTree(nouveau_B);
+
+	generateChilds(nouveau_A);
+	generateChilds(nouveau_B);
+
+	printf("\n_____________________\n");
+
+	printf("\n2e génération A\n");
+	displayTree(nouveau_A);
+	printf("\n");
+
+	printf("2e génération B\n");
+	displayTree(nouveau_B);
+	
+	printf("\n");
+
+	printf("Après freeTree A\n");
+	freeTree(nouveau_A);
+
+	displayTree(nouveau_A);
+
+	printf("\n");
+
+	return 0;
+}
+
+
+
